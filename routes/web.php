@@ -77,13 +77,21 @@ Route::post('/coupon/test','CouponController@test');
 
 
 //微信
-Route::prefix('/wx')->group(function(){
-    Route::get('/','WxController@index');       //接入
-    Route::post('/','WxController@wxEvent');
-    Route::get('/token','WxController@getAccessToken');        //获取access_token
-    Route::get('/create_menu','WxController@createMenu');        //创建菜单
-    Route::get('/upload_media','WxController@uploadMedia');        //上传素材
-    Route::get('/send_all','WxController@sendAll');         //群发消息
+//Route::prefix('/wx')->group(function(){
+//    Route::get('/','WxController@index');       //接入
+//    Route::post('/','WxController@wxEvent');
+//    Route::get('/token','WxController@getAccessToken');        //获取access_token
+//    Route::get('/create_menu','WxController@createMenu');        //创建菜单
+//    Route::get('/upload_media','WxController@uploadMedia');        //上传素材
+//    Route::get('/send_all','WxController@sendAll');         //群发消息
+//
+//});
 
+
+Route::prefix('/weixin')->group(function(){
+    Route::any('/','Weixin\IndexController@event');  //微信推送事件
+    Route::any('/token','Weixin\IndexController@gettoken');  //调用token
+    Route::post('/menu','Weixin\IndexController@menu');  //自定义菜单
+    Route::get('/media','Weixin\IndexController@media');  //临时素材
 });
 
