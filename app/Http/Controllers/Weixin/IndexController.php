@@ -43,7 +43,7 @@ class IndexController extends Controller
         $tmpStr = sha1( $tmpStr );
 
         if( $tmpStr == $signature ){
-            echo $_GET['echostr'];die;
+        //    echo $_GET['echostr'];die;
            //1、接收数据
             $xml_data = file_get_contents("php://input");
             //记录日志
