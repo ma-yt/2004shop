@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
 use GuzzleHttp\Client;
 use App\Models\User_info;
+use App\Models\Media;
+
 class IndexController extends Controller
 {
 
@@ -31,7 +33,7 @@ class IndexController extends Controller
 
 
     public  function jieru(){
-        //                if($this->yanqian()==false)
+//        if($this->yanqian()==false)
 //                {
 //                    //TODO 验签不通过
 //                    echo "";
@@ -92,35 +94,35 @@ class IndexController extends Controller
                 $user_id->save();
             }
         }elseif($data->MsgType=="text") {
-            $city = urlencode(str_replace("天气:","",$data->Content));
-            $key = "e2ca2bb61958e6478028e72b8a7a8b60";
-            $url = "http://apis.juhe.cn/simpleWeather/query?city=".$city."&key=".$key;
-            $tianqi = file_get_contents($url);
-            //file_put_contents('tianqi.txt',$tianqi);
-            $res = json_decode($tianqi,true);
-            $content="";
-            if($res['error_code']==0){
-                $today = $res['result']['realtime'];
-                $content .= "查询天气的城市:".$res['result']['city']."\n";
-                $content .= "天气详细情况".$today['info']."\n";
-                $content .= "温度".$today['temperature']."\n";
-                $content .= "湿度".$today['humidity']."\n";
-                $content .= "风向".$today['direct']."\n";
-                $content .= "风力".$today['power']."\n";
-                $content .= "空气质量指数".$today['aqi']."\n";
+                $city = urlencode(str_replace("天气:","",$data->Content));
+                $key = "e2ca2bb61958e6478028e72b8a7a8b60";
+                $url = "http://apis.juhe.cn/simpleWeather/query?city=".$city."&key=".$key;
+                $tianqi = file_get_contents($url);
+                //file_put_contents('tianqi.txt',$tianqi);
+                $res = json_decode($tianqi,true);
+                $content="";
+                if($res['error_code']==0){
+                    $today = $res['result']['realtime'];
+                    $content .= "查询天气的城市:".$res['result']['city']."\n";
+                    $content .= "天气详细情况".$today['info']."\n";
+                    $content .= "温度".$today['temperature']."\n";
+                    $content .= "湿度".$today['humidity']."\n";
+                    $content .= "风向".$today['direct']."\n";
+                    $content .= "风力".$today['power']."\n";
+                    $content .= "空气质量指数".$today['aqi']."\n";
 
-                //获取一个星期的天气
-                $future = $res['result']['future'];
-                foreach($future as $k=>$v){
-                    $content .= "日期:".date("Y-m-d",strtotime($v['date'])).$v['temperature'].",";
-                    $content .= "天气:".$v['weather']."\n";
+                    //获取一个星期的天气
+                    $future = $res['result']['future'];
+                    foreach($future as $k=>$v){
+                        $content .= "日期:".date("Y-m-d",strtotime($v['date'])).$v['temperature'].",";
+                        $content .= "天气:".$v['weather']."\n";
+                    }
+                }else{
+                    $content = "你查寻的天气失败，请输入正确的格式:天气、城市";
                 }
-            }else{
-                $content = "你查寻的天气失败，请输入正确的格式:天气、城市";
-            }
-            file_put_contents("tianqi.txt",$content);
+                file_put_contents("tianqi.txt",$content);
 
-            echo $this->responseMsg($data,$content);
+                echo $this->responseMsg($data,$content);
         }elseif($data->MsgType=="image"){
                 $xml = file_get_contents("php://input");
                 //file_put_contents('wx_event.log',$xml);
@@ -132,6 +134,14 @@ class IndexController extends Controller
                 $res = file_get_contents($url);
                 file_put_contents('yp.jpg',$res);
 
+                $data = [
+                    'media'=>$media_id,
+                    'openid'=>$obj->FromUserName,
+                    'msg_type'=>$obj->MsgType,
+                    'msgid'=>$obj->MsgId,
+                    'addtime'=>$obj->CreateTime
+                ];
+                Media::insert($data);
         }elseif($data->MsgType==""){
 
         }
