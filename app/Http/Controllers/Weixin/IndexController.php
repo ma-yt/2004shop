@@ -130,7 +130,7 @@ class IndexController extends Controller
                 $access_token = $this->gettoken();
                 $url = "https://api.weixin.qq.com/cgi-bin/media/get?access_token=".$access_token."&media_id=".$media_id;
                 $res = file_get_contents($url);
-                file_put_contents('tupian.jpg',$res);
+                file_put_contents('yp.jpg',$res);
 
         }elseif($data->MsgType==""){
 
