@@ -156,7 +156,7 @@ class IndexController extends Controller
         $xml = file_get_contents("php://input");
         //file_put_contents('wx_event.log',$xml);
         $obj = simplexml_load_string($xml,'SimpleXMLElement',LIBXML_NOCDATA);
-        //file_put_contents('wx_event.log',$obj);
+        file_put_contents('wx_event.log',$obj);
         $media_id = $obj->MediaId;
         $access_token = $this->gettoken();
         $url = "https://api.weixin.qq.com/cgi-bin/media/get?access_token=".$access_token."&media_id=".$media_id;
