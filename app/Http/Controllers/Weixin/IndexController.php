@@ -46,6 +46,7 @@ class IndexController extends Controller
         $data = simplexml_load_string($xml_data,'SimpleXMLElement',LIBXML_NOCDATA);
 //            file_put_contents('a.txt',$xml_data);die;
 
+       // print_r($data);die;
         if($data->MsgType=="event"){
             if($data->Event=="subscribe"){
                 $accesstoken = $this->gettoken();
@@ -120,7 +121,16 @@ class IndexController extends Controller
             file_put_contents("tianqi.txt",$content);
 
             echo $this->responseMsg($data,$content);
-        }elseif($data->MsgType==""){
+        }elseif($data->MsgType=="image"){
+                $xml = file_get_contents("php://input");
+                //file_put_contents('wx_event.log',$xml);
+                $obj = simplexml_load_string($xml,'SimpleXMLElement',LIBXML_NOCDATA);
+    //        file_put_contents('wx_event.log',$obj);
+                $media_id = $obj->MediaId;
+                $access_token = $this->gettoken();
+                $url = "https://api.weixin.qq.com/cgi-bin/media/get?access_token=".$access_token."&media_id=".$media_id;
+                $res = file_get_contents($url);
+                file_put_contents('tupian.jpg',$res);
 
         }elseif($data->MsgType==""){
 
@@ -152,17 +162,17 @@ class IndexController extends Controller
 
 
     //素材下载
-    public function media(){
-        $xml = file_get_contents("php://input");
-        //file_put_contents('wx_event.log',$xml);
-        $obj = simplexml_load_string($xml,'SimpleXMLElement',LIBXML_NOCDATA);
-        file_put_contents('wx_event.log',$obj);
-        $media_id = $obj->MediaId;
-        $access_token = $this->gettoken();
-        $url = "https://api.weixin.qq.com/cgi-bin/media/get?access_token=".$access_token."&media_id=".$media_id;
-        $res = file_get_contents($url);
-        file_put_contents('tupian.jpg',$res);
-    }
+//    public function media(){
+//        $xml = file_get_contents("php://input");
+//        //file_put_contents('wx_event.log',$xml);
+//        $obj = simplexml_load_string($xml,'SimpleXMLElement',LIBXML_NOCDATA);
+////        file_put_contents('wx_event.log',$obj);
+//        $media_id = $obj->MediaId;
+//        $access_token = $this->gettoken();
+//        $url = "https://api.weixin.qq.com/cgi-bin/media/get?access_token=".$access_token."&media_id=".$media_id;
+//        $res = file_get_contents($url);
+//        file_put_contents('tupian.jpg',$res);
+//    }
 
     public function gettoken(){
 

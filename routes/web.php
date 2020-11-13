@@ -89,7 +89,7 @@ Route::post('/coupon/test','CouponController@test');
 
 
 Route::prefix('/weixin')->group(function(){
-    Route::any('/jieru','Weixin\IndexController@jieru');
+    Route::post('/jieru','Weixin\IndexController@jieru');
 //    Route::any('/','Weixin\IndexController@event');  //微信推送事件
     Route::any('/token','Weixin\IndexController@gettoken');  //调用token
     Route::post('/menu','Weixin\IndexController@menu');  //自定义菜单
