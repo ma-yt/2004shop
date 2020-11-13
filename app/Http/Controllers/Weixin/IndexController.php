@@ -29,9 +29,7 @@ class IndexController extends Controller
         }
     }
 
-
-    public function event()
-    {
+    public function yanqian(){
         $signature = $_GET["signature"];
         $timestamp = $_GET["timestamp"];
         $nonce = $_GET["nonce"];
@@ -41,18 +39,31 @@ class IndexController extends Controller
         sort($tmpArr, SORT_STRING);
         $tmpStr = implode( $tmpArr );
         $tmpStr = sha1( $tmpStr );
+        if( $tmpStr == $signature ) {
+            return true;
+        }else{
+            return false;
+        }
+    }
 
-        if( $tmpStr == $signature ){
+
+    public function event()
+    {
+//                if($this->yanqian()==false)
+//                {
+//                    //TODO 验签不通过
+//                    echo "";
+//                    exit;
+//                }
         //    echo $_GET['echostr'];die;
            //1、接收数据
             $xml_data = file_get_contents("php://input");
             //记录日志
             file_put_contents('wx_event.log',$xml_data);
-//            echo "";
-//            die;
             //2、把xml文本转换成为php的对象或数组
             $data = simplexml_load_string($xml_data,'SimpleXMLElement',LIBXML_NOCDATA);
 //            file_put_contents('a.txt',$xml_data);die;
+
             if($data->MsgType=="event"){
                 if($data->Event=="subscribe"){
                     $accesstoken = $this->gettoken();
@@ -97,9 +108,7 @@ class IndexController extends Controller
                     $user_id->subscribe=0;
                     $user_id->save();
                 }
-            }
-            //天气
-            if($data->MsgType=="text"){
+            }elseif($data->MsgType=="text") {
                 $city = urlencode(str_replace("天气:","",$data->Content));
                 $key = "e2ca2bb61958e6478028e72b8a7a8b60";
                 $url = "http://apis.juhe.cn/simpleWeather/query?city=".$city."&key=".$key;
@@ -129,13 +138,28 @@ class IndexController extends Controller
                 file_put_contents("tianqi.txt",$content);
 
                 echo $this->responseMsg($data,$content);
+            }elseif($data->MsgType==""){
+
+            }elseif($data->MsgType==""){
 
             }
-        }//else{
-          //  echo "";
-       // }
+
+
     }
 
+
+    //素材下载
+    public function media(){
+        $xml = file_get_contents("php://input");
+        //file_put_contents('wx_event.log',$xml);
+        $obj = simplexml_load_string($xml,'SimpleXMLElement',LIBXML_NOCDATA);
+        //file_put_contents('wx_event.log',$obj);
+        $media_id = $obj->MediaId;
+        $access_token = $this->gettoken();
+        $url = "https://api.weixin.qq.com/cgi-bin/media/get?access_token=".$access_token."&media_id=".$media_id;
+        $res = file_get_contents($url);
+        file_put_contents('123.jpg',$res);
+    }
 
     public function gettoken(){
 
@@ -260,16 +284,5 @@ class IndexController extends Controller
         echo $res;
     }
 
-    //素材下载
-    public function media(){
-        $xml = file_get_contents("php://input");
-        //file_put_contents('wx_event.log',$xml);
-        $obj = simplexml_load_string($xml,'SimpleXMLElement',LIBXML_NOCDATA);
-        //file_put_contents('wx_event.log',$obj);
-        $media_id = $obj->MediaId;
-        $access_token = $this->gettoken();
-        $url = "https://api.weixin.qq.com/cgi-bin/media/get?access_token=".$access_token."&media_id=".$media_id;
-        $res = file_get_contents($url);
-        file_put_contents('123.jpg',$res);
-    }
+
 }
