@@ -228,12 +228,12 @@ class IndexController extends Controller
                                  [
                                      "type"=>"view",
                                      "name"=>"商城",
-                                     "url"=>"http://laravel.mayatong.top"
+                                     "url"=>"http://2004.mayatong.top"
                                  ]
                              ]
                          ],
                          [
-                               "name"=>"菜单",
+                               "name"=>"拍照",
                                "sub_button"=>[
                                    [
                                        "type"=>"view",
@@ -241,9 +241,10 @@ class IndexController extends Controller
                                        "url"=>"http://www.baidu.com/"
                                     ],
                                     [
-                                       "type"=>"click",
-                                       "name"=>"赞一下我们",
-                                       "key"=>"V1001_GOOD"
+                                       "type"=>"pic_photo_or_album",
+                                       "name"=>"拍照或者发图",
+                                       "key"=>"rselfmenu_1_1",
+                                        "sub_button"=>[ ]
                                     ]
                                ]
                          ]]
@@ -264,7 +265,7 @@ class IndexController extends Controller
         $xml = file_get_contents("php://input");
         //file_put_contents('wx_event.log',$xml);
         $obj = simplexml_load_string($xml,'SimpleXMLElement',LIBXML_NOCDATA);
-        file_put_contents('wx_event.log',$obj);
+        //file_put_contents('wx_event.log',$obj);
         $media_id = $obj->MediaId;
         $access_token = $this->gettoken();
         $url = "https://api.weixin.qq.com/cgi-bin/media/get?access_token=".$access_token."&media_id=".$media_id;
