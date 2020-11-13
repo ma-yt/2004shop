@@ -31,22 +31,103 @@ class IndexController extends Controller
 
 
     public  function jieru(){
-        $signature = $_GET["signature"];
-        $timestamp = $_GET["timestamp"];
-        $nonce = $_GET["nonce"];
+        //                if($this->yanqian()==false)
+//                {
+//                    //TODO 验签不通过
+//                    echo "";
+//                    exit;
+//                }
+        //    echo $_GET['echostr'];die;
+        //1、接收数据
+        $xml_data = file_get_contents("php://input");
+        //记录日志
+        file_put_contents('wx_event.log',$xml_data);
+        //2、把xml文本转换成为php的对象或数组
+        $data = simplexml_load_string($xml_data,'SimpleXMLElement',LIBXML_NOCDATA);
+//            file_put_contents('a.txt',$xml_data);die;
 
-        $token = env('WX_TOKEN');
-        $tmpArr = array($token, $timestamp, $nonce);
-        sort($tmpArr, SORT_STRING);
-        $tmpStr = implode( $tmpArr );
-        $tmpStr = sha1( $tmpStr );
-        if( $tmpStr == $signature ) {
-            echo $_GET['echostr'];
-        }else{
-            return false;
+        if($data->MsgType=="event"){
+            if($data->Event=="subscribe"){
+                $accesstoken = $this->gettoken();
+                $openid = $data->FromUserName;
+                $url = "https://api.weixin.qq.com/cgi-bin/user/info?access_token=".$accesstoken."&openid=".$openid."&lang=zh_CN";
+                $user = file_get_contents($url);
+                $res = json_decode($user,true);
+                if(isset($res['errcode'])){
+                    file_put_contents('wx_event.log',$res['errcode']);
+                }else{
+                    $user_id = User_info::where('openid',$openid)->first();
+                    if($user_id){
+                        $user_id->subscribe=1;
+                        $user_id->save();
+                        $contentt = "感谢再次关注";
+                    }else{
+                        $res = [
+                            'subscribe'=>$res['subscribe'],
+                            'openid'=>$res['openid'],
+                            'nickname'=>$res['nickname'],
+                            'sex'=>$res['sex'],
+                            'city'=>$res['city'],
+                            'country'=>$res['country'],
+                            'province'=>$res['province'],
+                            'language'=>$res['language'],
+                            'headimgurl'=>$res['headimgurl'],
+                            'subscribe_time'=>$res['subscribe_time'],
+                            'subscribe_scene'=>$res['subscribe_scene']
+
+                        ];
+                        User_info::insert($res);
+                        $contentt = "欢迎老铁关注";
+
+                    }
+
+                }
+                echo $this->responseMsg($data,$contentt);
+
+            }
+            //取消关注
+            if($data->Event=='unsubscribe'){
+                $user_id->subscribe=0;
+                $user_id->save();
+            }
+        }elseif($data->MsgType=="text") {
+            $city = urlencode(str_replace("天气:","",$data->Content));
+            $key = "e2ca2bb61958e6478028e72b8a7a8b60";
+            $url = "http://apis.juhe.cn/simpleWeather/query?city=".$city."&key=".$key;
+            $tianqi = file_get_contents($url);
+            //file_put_contents('tianqi.txt',$tianqi);
+            $res = json_decode($tianqi,true);
+            $content="";
+            if($res['error_code']==0){
+                $today = $res['result']['realtime'];
+                $content .= "查询天气的城市:".$res['result']['city']."\n";
+                $content .= "天气详细情况".$today['info']."\n";
+                $content .= "温度".$today['temperature']."\n";
+                $content .= "湿度".$today['humidity']."\n";
+                $content .= "风向".$today['direct']."\n";
+                $content .= "风力".$today['power']."\n";
+                $content .= "空气质量指数".$today['aqi']."\n";
+
+                //获取一个星期的天气
+                $future = $res['result']['future'];
+                foreach($future as $k=>$v){
+                    $content .= "日期:".date("Y-m-d",strtotime($v['date'])).$v['temperature'].",";
+                    $content .= "天气:".$v['weather']."\n";
+                }
+            }else{
+                $content = "你查寻的天气失败，请输入正确的格式:天气、城市";
+            }
+            file_put_contents("tianqi.txt",$content);
+
+            echo $this->responseMsg($data,$content);
+        }elseif($data->MsgType==""){
+
+        }elseif($data->MsgType==""){
+
         }
     }
 
+    //验签
     public function yanqian(){
         $signature = $_GET["signature"];
         $timestamp = $_GET["timestamp"];
@@ -65,105 +146,9 @@ class IndexController extends Controller
     }
 
 
-    public function event()
-    {
-//                if($this->yanqian()==false)
-//                {
-//                    //TODO 验签不通过
-//                    echo "";
-//                    exit;
-//                }
-        //    echo $_GET['echostr'];die;
-           //1、接收数据
-            $xml_data = file_get_contents("php://input");
-            //记录日志
-            file_put_contents('wx_event.log',$xml_data);
-            //2、把xml文本转换成为php的对象或数组
-            $data = simplexml_load_string($xml_data,'SimpleXMLElement',LIBXML_NOCDATA);
-//            file_put_contents('a.txt',$xml_data);die;
-
-            if($data->MsgType=="event"){
-                if($data->Event=="subscribe"){
-                    $accesstoken = $this->gettoken();
-                    $openid = $data->FromUserName;
-                    $url = "https://api.weixin.qq.com/cgi-bin/user/info?access_token=".$accesstoken."&openid=".$openid."&lang=zh_CN";
-                    $user = file_get_contents($url);
-                    $res = json_decode($user,true);
-                    if(isset($res['errcode'])){
-                        file_put_contents('wx_event.log',$res['errcode']);
-                    }else{
-                        $user_id = User_info::where('openid',$openid)->first();
-                        if($user_id){
-                            $user_id->subscribe=1;
-                            $user_id->save();
-                            $contentt = "感谢再次关注";
-                        }else{
-                            $res = [
-                                'subscribe'=>$res['subscribe'],
-                                'openid'=>$res['openid'],
-                                'nickname'=>$res['nickname'],
-                                'sex'=>$res['sex'],
-                                'city'=>$res['city'],
-                                'country'=>$res['country'],
-                                'province'=>$res['province'],
-                                'language'=>$res['language'],
-                                'headimgurl'=>$res['headimgurl'],
-                                'subscribe_time'=>$res['subscribe_time'],
-                                'subscribe_scene'=>$res['subscribe_scene']
-
-                            ];
-                            User_info::insert($res);
-                            $contentt = "欢迎老铁关注";
-
-                        }
-
-                    }
-                    echo $this->responseMsg($data,$contentt);
-
-                }
-                //取消关注
-                if($data->Event=='unsubscribe'){
-                    $user_id->subscribe=0;
-                    $user_id->save();
-                }
-            }elseif($data->MsgType=="text") {
-                $city = urlencode(str_replace("天气:","",$data->Content));
-                $key = "e2ca2bb61958e6478028e72b8a7a8b60";
-                $url = "http://apis.juhe.cn/simpleWeather/query?city=".$city."&key=".$key;
-                $tianqi = file_get_contents($url);
-                //file_put_contents('tianqi.txt',$tianqi);
-                $res = json_decode($tianqi,true);
-                $content="";
-                if($res['error_code']==0){
-                    $today = $res['result']['realtime'];
-                    $content .= "查询天气的城市:".$res['result']['city']."\n";
-                    $content .= "天气详细情况".$today['info']."\n";
-                    $content .= "温度".$today['temperature']."\n";
-                    $content .= "湿度".$today['humidity']."\n";
-                    $content .= "风向".$today['direct']."\n";
-                    $content .= "风力".$today['power']."\n";
-                    $content .= "空气质量指数".$today['aqi']."\n";
-
-                    //获取一个星期的天气
-                    $future = $res['result']['future'];
-                    foreach($future as $k=>$v){
-                        $content .= "日期:".date("Y-m-d",strtotime($v['date'])).$v['temperature'].",";
-                        $content .= "天气:".$v['weather']."\n";
-                    }
-                }else{
-                    $content = "你查寻的天气失败，请输入正确的格式:天气、城市";
-                }
-                file_put_contents("tianqi.txt",$content);
-
-                echo $this->responseMsg($data,$content);
-            }elseif($data->MsgType==""){
-
-            }elseif($data->MsgType==""){
-
-            }
-
-
-    }
+//    public function event()
+//    {
+//    }
 
 
     //素材下载
