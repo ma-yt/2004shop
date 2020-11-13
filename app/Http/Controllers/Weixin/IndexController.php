@@ -125,7 +125,7 @@ class IndexController extends Controller
                 echo $this->responseMsg($data,$content);
         }elseif($data->MsgType=="image"){
                 $xml = file_get_contents("php://input");
-                file_put_contents('wx_event.log',$xml);die;
+                //file_put_contents('wx_event.log',$xml);
                 $obj = simplexml_load_string($xml,'SimpleXMLElement',LIBXML_NOCDATA);
                 $media_id = $obj->MediaId;
                 $access_token = $this->gettoken();
