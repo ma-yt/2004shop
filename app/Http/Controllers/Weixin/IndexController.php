@@ -125,12 +125,12 @@ class IndexController extends Controller
                 echo $this->responseMsg($data,$content);
         }elseif($data->MsgType=="image"){
                $res = [
-                   'openid'=>$data->FromUserName,
-                   'msg_type'=>$data->MsgType,
-                   'picurl'=>$data->PicUrl,
-                   'msgid'=>$data->MsgId,
-                   'media_id'=>$data->MediaId,
-                   'addtime'=>$data->CreateTime
+                   "openid"=>$data->FromUserName,
+                   "msg_type"=>$data->MsgType,
+                   "picurl"=>$data->PicUrl,
+                   "msgid"=>$data->MsgId,
+                   "media_id"=>$data->MediaId,
+                   "addtime"=>$data->CreateTime
                ];
                $image = Media::where('picurl',$data['picurl'])->first();
                 if(!$image){
