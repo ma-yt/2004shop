@@ -144,6 +144,7 @@ class IndexController extends Controller
                 file_put_contents('image.jpg',$result);
                 $Content = "图片";
                 echo $this->responseMsg($data,$Content);
+
         }elseif($data->MsgType=="voice"){
             $access_token = $this->gettoken();
             $url = "https://api.weixin.qq.com/cgi-bin/media/get?access_token=".$access_token."&media_id=".$data->MediaId;
@@ -151,6 +152,7 @@ class IndexController extends Controller
             file_put_contents('image.jpg',$result);
             $Content = "语音";
             echo $this->responseMsg($data,$Content);
+
         }else if($data->Event=="CLICK"){
               if($data->EventKey=="V1001_TODAY_wx"){
                     $key = $data->FromUserName;
