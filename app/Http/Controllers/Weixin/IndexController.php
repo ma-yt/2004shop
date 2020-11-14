@@ -132,14 +132,15 @@ class IndexController extends Controller
                    'media_id'=>$data->MediaId,
                    'addtime'=>$data->CreateTime
                ];
+            dd($res);
                $image = Media::where('picurl',$data['picurl'])->first();
-                if($image){
+                if(!$image){
                     $images = $image->insert($res);
                 }
 
                 //图片存入到public中
-                $access_token = $this->gettoken();
-                file_put_contents('wx_event.log',$access_token);
+                //$access_token = $this->gettoken();
+//                file_put_contents('wx_event.log',$access_token);
         }elseif($data->MsgType==""){
 
         }
