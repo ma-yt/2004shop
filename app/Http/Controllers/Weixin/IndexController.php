@@ -179,9 +179,10 @@ class IndexController extends Controller
                     $zadd = Redis::zadd($key, $zincrby, $times);
                     $score=Redis::incrby($key."_score",5);
                     $content = "签到成功您以签到" . $zincrby . "天,积累获得".$score."积分";
+                    echo $this->responseMsg($data,$content);
                 }
             }
-            echo $this->responseMsg($data,$content);
+
         }
     }
 
