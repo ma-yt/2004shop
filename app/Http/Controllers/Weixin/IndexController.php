@@ -167,6 +167,7 @@ class IndexController extends Controller
                 }
                 if ($date == $times) {
                     $content = "您今日已经签到过了!";
+                    echo $this->responseMsg($data,$content);
                 } else {
                     $zcard = Redis::zcard($key);
                     if ($zcard >= 1) {
