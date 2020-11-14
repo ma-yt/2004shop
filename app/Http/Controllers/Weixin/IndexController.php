@@ -177,12 +177,12 @@ class IndexController extends Controller
                     $keys = $keys['FromUserName'];
                     $zincrby = Redis::zincrby($key, 1, $keys);
                     $zadd = Redis::zadd($key, $zincrby, $times);
-                    $score=Redis::incrby($key."_score",10);
+                    $score=Redis::incrby($key."_score",5);
                     $content = "签到成功您以签到" . $zincrby . "天,积累获得".$score."积分";
                 }
             }
         }
-        echo $this->responseMsg($data,$content);die;
+        echo $this->responseMsg($data,$content);
     }
 
     //验签
