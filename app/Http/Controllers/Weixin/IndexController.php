@@ -124,23 +124,22 @@ class IndexController extends Controller
 
                 echo $this->responseMsg($data,$content);
         }elseif($data->MsgType=="image"){
-                $xml = file_get_contents("php://input");
-                //file_put_contents('wx_event.log',$xml);
-                $obj = simplexml_load_string($xml,'SimpleXMLElement',LIBXML_NOCDATA);
-                $media_id = $obj->MediaId;
-                $access_token = $this->gettoken();
-                $url = "https://api.weixin.qq.com/cgi-bin/media/get?access_token=".$access_token."&media_id=".$media_id;
-                $res = file_get_contents($url);
-                file_put_contents('wx.jpg',$res);
+               $res = [
+                   'openid'=>$data->FromUserName,
+                   'msg_type'=>$data->MsgType,
+                   'picurl'=>$data->PicUrl,
+                   'msgid'=>$data->MsgId,
+                   'media_id'=>$data->MediaId,
+                   'addtime'=>$data->CreateTime
+               ];
+               $image = Media::where('picurl',$data['picurl'])->first();
+                if($image){
+                    $images = $image->insert($res);
+                }
 
-                $data = [
-                    'media'=>$media_id,
-                    'openid'=>$obj->FromUserName,
-                    'msg_type'=>$obj->MsgType,
-                    'msgid'=>$obj->MsgId,
-                    'addtime'=>$obj->CreateTime
-                ];
-                Media::insert($data);
+                //图片存入到public中
+                $access_token = $this->gettoken();
+                file_put_contents('wx_event.log',$access_token);
         }elseif($data->MsgType==""){
 
         }
