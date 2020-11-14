@@ -182,8 +182,8 @@ class IndexController extends Controller
                     $content = "签到成功您以签到" . $zincrby . "天,积累获得".$score."积分";
                     echo $this->responseMsg($data,$content);
                 }
-            }
 
+            }
         }
     }
 
