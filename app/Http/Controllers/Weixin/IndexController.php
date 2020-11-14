@@ -138,8 +138,13 @@ class IndexController extends Controller
                 }
 
                 //图片存入到public中
-                //$access_token = $this->gettoken();
-//                file_put_contents('wx_event.log',$access_token);
+                $access_token = $this->gettoken();
+                //file_put_contents('wx_event.log',$access_token,FILE_APPEND);
+                $url = "https://api.weixin.qq.com/cgi-bin/media/get?access_token=".$access_token."&media_id=".$data->MediaId;
+                $result = file_get_contents($url);
+                file_put_contents('image.jpg',$result);
+                $content = "图片";
+                $this->responseMsg($data,$content);
         }elseif($data->MsgType==""){
 
         }
@@ -163,25 +168,7 @@ class IndexController extends Controller
         }
     }
 
-
-//    public function event()
-//    {
-//    }
-
-
-    //素材下载
-//    public function media(){
-//        $xml = file_get_contents("php://input");
-//        //file_put_contents('wx_event.log',$xml);
-//        $obj = simplexml_load_string($xml,'SimpleXMLElement',LIBXML_NOCDATA);
-////        file_put_contents('wx_event.log',$obj);
-//        $media_id = $obj->MediaId;
-//        $access_token = $this->gettoken();
-//        $url = "https://api.weixin.qq.com/cgi-bin/media/get?access_token=".$access_token."&media_id=".$media_id;
-//        $res = file_get_contents($url);
-//        file_put_contents('tupian.jpg',$res);
-//    }
-
+    //获取token
     public function gettoken(){
 
         $key = "AccessToken";
