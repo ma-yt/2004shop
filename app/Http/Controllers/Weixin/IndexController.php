@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Redis;
 use GuzzleHttp\Client;
 use App\Models\User_info;
 use App\Models\Media;
-
+use DB;
 class IndexController extends Controller
 {
 
@@ -123,18 +123,18 @@ class IndexController extends Controller
                 file_put_contents("tianqi.txt",$content);
 
                 echo $this->responseMsg($data,$content);
-        }elseif($data->MsgType=="image"){
+        }else if($data->MsgType=="image"){
                $res = [
-                   "openid"=>$data->FromUserName,
-                   "msg_type"=>$data->MsgType,
-                   "picurl"=>$data->PicUrl,
-                   "msgid"=>$data->MsgId,
-                   "media_id"=>$data->MediaId,
-                   "addtime"=>$data->CreateTime
+                   "openid"=>(string)$data->FromUserName,
+                   "msg_type"=>(string)$data->MsgType,
+                   "picurl"=>(string)$data->PicUrl,
+                   "msgid"=>(string)$data->MsgId,
+                   "media_id"=>(string)$data->MediaId,
+                   "addtime"=>(string)$data->CreateTime
                ];
-               $image = Media::where('picurl',$data['picurl'])->first();
+               $image = Media::where('picurl',(string)$data->PicUrl)->first();
                 if(!$image){
-                    $images = $image->insert($res);
+                    $images =Media::insert($res);
                 }
 
                 //图片存入到public中
