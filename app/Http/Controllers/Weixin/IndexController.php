@@ -92,7 +92,8 @@ class IndexController extends Controller
                 $user_id->subscribe=0;
                 $user_id->save();
             }
-        }elseif($data->MsgType=="text") {
+        }
+        if($data->MsgType=="text") {
                 $city = urlencode(str_replace("天气:","",$data->Content));
                 $key = "e2ca2bb61958e6478028e72b8a7a8b60";
                 $url = "http://apis.juhe.cn/simpleWeather/query?city=".$city."&key=".$key;
@@ -122,7 +123,8 @@ class IndexController extends Controller
                 file_put_contents("tianqi.txt",$content);
 
                 echo $this->responseMsg($data,$content);
-        }else if($data->MsgType=="image"){
+        }
+        if($data->MsgType=="image"){
                $res = [
                    "openid"=>(string)$data->FromUserName,
                    "msg_type"=>(string)$data->MsgType,
@@ -145,7 +147,8 @@ class IndexController extends Controller
                 $Content = "图片";
                 echo $this->responseMsg($data,$Content);
 
-        }elseif($data->MsgType=="voice"){
+        }
+        if($data->MsgType=="voice"){
             $access_token = $this->gettoken();
             $url = "https://api.weixin.qq.com/cgi-bin/media/get?access_token=".$access_token."&media_id=".$data->MediaId;
             $result = file_get_contents($url);
@@ -153,7 +156,9 @@ class IndexController extends Controller
             $Content = "语音";
             echo $this->responseMsg($data,$Content);
 
-        }else if($data->Event=="CLICK"){
+        }
+        if($data->Event=="CLICK"){
+
               if($data->EventKey=="V1001_TODAY_wx"){
                     $content="ok?";
                   echo $this->responseMsg($data,$content);die;
