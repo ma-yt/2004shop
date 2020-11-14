@@ -132,7 +132,6 @@ class IndexController extends Controller
                    'media_id'=>$data->MediaId,
                    'addtime'=>$data->CreateTime
                ];
-            dd($res);
                $image = Media::where('picurl',$data['picurl'])->first();
                 if(!$image){
                     $images = $image->insert($res);
