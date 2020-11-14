@@ -158,32 +158,31 @@ class IndexController extends Controller
 
         }
         if($data->Event=="CLICK"){
+            if($data->EventKey=="V1001_TODAY_wx") {
+                $key = $data->FromUserName;
+                $times = date("Y-m-d", time());
+                $date = Redis::zrange($key, 0, -1);
+                if ($date) {
+                    $date = $date[0];
+                }
+                if ($date == $times) {
+                    $content = "您今日已经签到过了!";
+                } else {
+                    $zcard = Redis::zcard($key);
+                    if ($zcard >= 1) {
+                        Redis::zremrangebyrank($key, 0, 0);
+                    }
+                    $keys = json_decode(json_encode($data),true);
 
-              if($data->EventKey=="V1001_TODAY_wx"){
-
-
-                  $key = $data->FromUserName;
-                    $times = date("Y-m-d",time());
-                  $date =  Redis::zrange($key,0,-1);
-                  if($date){
-                      $date = $date[0];
-                  }
-                  if($date == $times){
-                      $content = "您今天已经签到了!请明天再来";
-                  }else{
-                      $zcard = Redis::zcard($key);
-                      if($zcard>=1){
-                        Redis::zremrangebyrank($key,0,0);
-                      }
-                      $keys = json_decode(json_encode($data),true);
-                      $k = $keys['FromUserName'];
-                      $z = Redis::incrby($key,$k);
-                      $zad = Redis::zadd($key,$z,$times);
-                      $content = "签到成功累计签到".$z."天";
-                  }
-              }
-            echo $this->responseMsg($data,$content);
+                    $keys = $keys['FromUserName'];
+                    $zincrby = Redis::zincrby($key, 1, $keys);
+                    $zadd = Redis::zadd($key, $zincrby, $times);
+                    $score=Redis::incrby($key."_score",10);
+                    $content = "签到成功您以签到" . $zincrby . "天,积累获得".$score."积分";
+                }
+            }
         }
+        echo $this->responseMsg($data,$content);die;
     }
 
     //验签
