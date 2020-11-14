@@ -160,8 +160,7 @@ class IndexController extends Controller
         if($data->Event=="CLICK"){
 
               if($data->EventKey=="V1001_TODAY_wx"){
-                    $content="ok?";
-                  echo $this->responseMsg($data,$content);die;
+                   
 
                   $key = $data->FromUserName;
                     $times = date("Y-m-d",time());
