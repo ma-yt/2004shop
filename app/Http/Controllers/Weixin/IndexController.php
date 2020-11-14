@@ -160,7 +160,7 @@ class IndexController extends Controller
         if($data->Event=="CLICK"){
 
               if($data->EventKey=="V1001_TODAY_wx"){
-                   
+
 
                   $key = $data->FromUserName;
                     $times = date("Y-m-d",time());
@@ -177,7 +177,7 @@ class IndexController extends Controller
                       }
                       $keys = json_decode(json_encode($data),true);
                       $k = $keys['FromUserName'];
-                      $z = Redis::zincrby($key,$k);
+                      $z = Redis::incrby($key,$k);
                       $zad = Redis::zadd($key,$z,$times);
                       $content = "签到成功累计签到".$z."天";
                   }
