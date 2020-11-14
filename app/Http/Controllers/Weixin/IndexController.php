@@ -152,6 +152,29 @@ class IndexController extends Controller
             file_put_contents('image.jpg',$result);
             $Content = "语音";
             echo $this->responseMsg($data,$Content);
+        }else if($data->Event=="CLICK"){
+              if($data->EventKey=="V1001_TODAY_wx"){
+                    $key = $data->FromUserName;
+                    $times = date("Y-m-d",time());
+                  $date =  Redis::zrange($key,0,-1);
+                  if($date){
+                      $date = $date[0];
+                  }
+                  if($date == $times){
+                      $content = "您今天已经签到了!请明天再来";
+                  }else{
+                      $zcard = Redis::zcard($key);
+                      if($zcard>=1){
+                        Redis::zremrangebyrank($key,0,0);
+                      }
+                      $keys = json_decode(json_encode($data),true);
+                      $k = $keys['FromUserName'];
+                      $z = Redis::zincrby($key,$k);
+                      Redis::zadd($key,$z,$times);
+                      $content = "签到成功累计签到".$z."天";
+                  }
+              }
+            echo $this->responseMsg($data,$content);
         }
     }
 
@@ -266,7 +289,12 @@ class IndexController extends Controller
                                      "type"=>"view",
                                      "name"=>"商城",
                                      "url"=>"http://2004.mayatong.top"
-                                 ]
+                                 ],
+                                 [
+                                     "type"=>"click",
+                                     "name"=>"签到",
+                                     "key"=>"V1001_TODAY_wx"
+                                 ],
                              ]
                          ],
                          [
