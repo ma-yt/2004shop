@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Redis;
 use GuzzleHttp\Client;
 use App\Models\User_info;
 use App\Models\Media;
-use DB;
 class IndexController extends Controller
 {
 
@@ -170,7 +169,7 @@ class IndexController extends Controller
                       $keys = json_decode(json_encode($data),true);
                       $k = $keys['FromUserName'];
                       $z = Redis::zincrby($key,$k);
-                      Redis::zadd($key,$z,$times);
+                      $zad = Redis::zadd($key,$z,$times);
                       $content = "签到成功累计签到".$z."天";
                   }
               }
