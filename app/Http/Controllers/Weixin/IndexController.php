@@ -155,7 +155,10 @@ class IndexController extends Controller
 
         }else if($data->Event=="CLICK"){
               if($data->EventKey=="V1001_TODAY_wx"){
-                    $key = $data->FromUserName;
+                    $content="ok?";
+                  echo $this->responseMsg($data,$content);die;
+
+                  $key = $data->FromUserName;
                     $times = date("Y-m-d",time());
                   $date =  Redis::zrange($key,0,-1);
                   if($date){
