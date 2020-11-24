@@ -94,5 +94,16 @@ Route::prefix('/weixin')->group(function(){
     Route::any('/token','Weixin\IndexController@gettoken');  //调用token
     Route::post('/menu','Weixin\IndexController@menu');  //自定义菜单
     Route::get('/media','Weixin\IndexController@media');  //临时素材
+    Route::any('/xcx','Weixin\XcxController@xcxlogin');  //小程序登录
+});
+
+
+//小程序接口
+Route::prefix('/api')->group(function(){
+    Route::get('/test','Weixin\ApiController@test');
+    Route::get('/goodslist','Weixin\ApiController@glist');    //商品列表
+    Route::get('/goodsdetail','Weixin\ApiController@detail');    //商品详情
+    Route::get('/cart','Weixin\ApiController@cart');
+    Route::get('/adduser','Weixin\ApiController@adduser');    //添加用户
 });
 
