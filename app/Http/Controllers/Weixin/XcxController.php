@@ -14,7 +14,6 @@ class XcxController extends Controller
         $code = $request->code;
         $url = "https://api.weixin.qq.com/sns/jscode2session?appid=".env('WX_XCX_APPID')."&secret=".env('WX_XCX_APPSECRET')."&js_code=".$code."&grant_type=authorization_code";
         $res = json_decode(file_get_contents($url),true);
-
         //自定义登录状态
         if(isset($res['errcode'])){      //有错误
             $response = [

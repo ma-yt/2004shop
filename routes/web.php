@@ -105,5 +105,6 @@ Route::prefix('/api')->group(function(){
     Route::get('/goodsdetail','Weixin\ApiController@detail');    //商品详情
     Route::get('/cart','Weixin\ApiController@cart');
     Route::get('/adduser','Weixin\ApiController@adduser');    //添加用户
+    Route::post('/user-login','Weixin\ApiController@userlogin');
 });
 

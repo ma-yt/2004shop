@@ -7,6 +7,8 @@ use App\Models\Cart;
 use Illuminate\Http\Request;
 use DB;
 use App\Models\Goods;
+use App\Models\XcxLogin;
+use Illuminate\Support\Facades\Redis;
 
 class ApiController extends Controller
 {
@@ -63,5 +65,41 @@ class ApiController extends Controller
     //添加用户
     public function adduser(){
         echo '<pre>';$_GET;echo '</pre>';
+    }
+
+
+    public function userlogin(Request $request){
+        //接收code
+        //$code = $request->get('code');
+        $token = $request->get('token');
+
+        //获取用户信息
+        $userinfo = json_decode(file_get_contents("php://input"), true);
+
+        $redis_login_hash = 'h:xcx:login:' . $token;
+        $openid = Redis::hget($redis_login_hash, 'openid');          //用户OpenID
+
+        $u0 = XcxLogin::where(['openid' => $openid])->first();
+        if($u0->update_time == 0){     // 未更新过资料
+            //因为用户已经在首页登录过 所以只需更新用户信息表
+            $u_info = [
+                'nickname'=>$userinfo['u']['nickName'],
+                'sex'=>$userinfo['u']['gender'],
+                'language'=>$userinfo['u']['language'],
+                'city'=>$userinfo['u']['city'],
+                'province'=>$userinfo['u']['province'],
+                'country'=>$userinfo['u']['country'],
+                'headimgurl'=>$userinfo['u']['avatarUrl'],
+                'update_time'   => time()
+            ];
+            XcxLogin::where(['openid' => $openid])->update($u_info);
+        }
+
+        $response = [
+            'errno' => 0,
+            'msg' => 'ok',
+        ];
+
+        return $response;
     }
 }
