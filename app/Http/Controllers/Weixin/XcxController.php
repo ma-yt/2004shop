@@ -30,6 +30,7 @@ class XcxController extends Controller
             $user = XcxLogin::where(['openid'=>$openid])->first();
             if($user){
                 //TODO  老用户
+                $id = $user->id;
             }else{
                 $user_info = [
                     'openid'=>$openid,
@@ -48,7 +49,7 @@ class XcxController extends Controller
             $token = sha1($res['openid'] . $res['session_key'].mt_rand(0,9999));
             //保存token
             $key = 'xcx_token:'.$token;
-            Redis::set($key,time());
+            Redis::hmset($key,time());
             Redis::expire($key,7200);
             $response = [
                 'err'=>0,
