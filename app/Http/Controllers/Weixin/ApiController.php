@@ -130,6 +130,7 @@ class ApiController extends Controller
             $openid = Redis::hget($redis_login_hash, 'openid');          //用户OpenID
 
         $u0 = XcxLogin::where(['openid' => $openid])->first();
+//        dd($u0->update_time);
         if($u0->update_time == 0){     // 未更新过资料
             //因为用户已经在首页登录过 所以只需更新用户信息表
             $u_info = [
@@ -142,7 +143,7 @@ class ApiController extends Controller
                 'headimgurl'=>$userinfo['u']['avatarUrl'],
                 'update_time'   => time()
             ];
-            XcxLogin::where(['openid' => $openid])->update($u_info);
+            XcxLogin::where('openid',$u0->openid)->update($u_info);
         }
 
         $response = [
