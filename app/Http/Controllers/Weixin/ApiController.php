@@ -54,7 +54,7 @@ class ApiController extends Controller
     //添加购物车
     public function cart(Request $request){
         $goods_id = $request->post('goods_id');
-        $goods_number = $request->post('goods_number');
+        $goods_number = $request->post('goods_number',1);
         $uid = $_SERVER['uid'];
 
         //查询商品价格
