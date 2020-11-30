@@ -61,7 +61,7 @@ class ApiController extends Controller
         $shop_price = Goods::find($goods_id)->shop_price;
 
         //判断购物车中商品是否存在
-        $goods = Cart::where(['uid'=>$uid,'goods_id'=>$goods_id])->first();
+        $goods = Cart::where(['user_id'=>$uid,'goods_id'=>$goods_id])->first();
         if($goods){  //增加数量
             Goods::where(['goods_id'=>$goods_id])->update(['goods_number'=>$goods_number]);
             $response = [
