@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+        <html>
+            <head>
+                <meta charset="utf-8">
+            </head>
+
+            <body>
+                <script>
+                    let arr = [10,20,30,40,50,60,70,80];
+                    arr.forEach((item)=>{
+                        console.log(item);
+                    });
+
+                    let status = arr.every(function(item){
+                        if(item>0){
+                            return true;
+                        }else{
+                            return false;
+                        }
+                    });
+                    console.log(status);
+                </script>
+            </body>
+        </html>

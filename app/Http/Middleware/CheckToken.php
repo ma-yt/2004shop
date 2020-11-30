@@ -21,6 +21,7 @@ class CheckToken
         if($login_info){
             $_SERVER['uid'] = $login_info['uid'];
         }else{
+            dd("为空");
             $response = [
                 'errno'=>40003,
                 'msg'=>'未授权'

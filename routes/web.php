@@ -108,6 +108,7 @@ Route::prefix('/api')->group(function(){
     Route::post('/user-login','Weixin\ApiController@userlogin');   //个人中心登录
     Route::get('/add-fav','Weixin\ApiController@addfav');   //添加收藏
     Route::post('/cart','Weixin\ApiController@cart')->middleware('check.token');   //加入购物车
-    Route::get('/cart-list','Weixin\ApiController@cartlist');  //购物车列表
+    Route::get('/cart-list','Weixin\ApiController@cartlist')->middleware('check.token');  //购物车列表
+    Route::post('/cartdel','Weixin\ApiController@cartdel')->middleware('check.token');  //购物车删除
 });
 

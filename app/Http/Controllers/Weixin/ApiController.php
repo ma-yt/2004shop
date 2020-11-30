@@ -54,31 +54,42 @@ class ApiController extends Controller
     //添加购物车
     public function cart(Request $request){
         $goods_id = $request->post('goods_id');
+        $goods_number = $request->post('goods_number');
         $uid = $_SERVER['uid'];
 
         //查询商品价格
         $shop_price = Goods::find($goods_id)->shop_price;
 
-        //将商品存储购物车表 或 redis
-        $info = [
-            'goods_id'=>$goods_id,
-            'user_id'=>$uid,
-            'goods_number'=>1,
-            'add_time'=>time(),
-            'cart_price'=>$shop_price
-        ];
-
-        $cart = Cart::insertGetId($info);
-        if($cart){
+        //判断购物车中商品是否存在
+        $goods = Cart::where(['uid'=>$uid,'goods_id'=>$goods_id])->first();
+        if($goods){  //增加数量
+            Goods::where(['goods_id'=>$goods_id])->update(['goods_number'=>$goods_number]);
             $response = [
                 'errno'=>0,
                 'msg'=>'ok'
             ];
         }else{
-            $response = [
-                'errno'=>50002,
-                'msg'=>'加入购物车失败'
+            //将商品存储购物车表 或 redis
+            $info = [
+                'goods_id'=>$goods_id,
+                'user_id'=>$uid,
+                'goods_number'=>1,
+                'add_time'=>time(),
+                'cart_price'=>$shop_price
             ];
+
+            $cart = Cart::insertGetId($info);
+            if($cart){
+                $response = [
+                    'errno'=>0,
+                    'msg'=>'ok'
+                ];
+            }else{
+                $response = [
+                    'errno'=>50002,
+                    'msg'=>'加入购物车失败'
+                ];
+            }
         }
         return $response;
     }
@@ -86,7 +97,7 @@ class ApiController extends Controller
 
     //购物车列表
     public function cartlist(){
-        $uid = 1;
+        $uid = $_SERVER['uid'];
         $goods = Cart::where(['user_id'=>$uid])->get();
         if($goods)      //购物车有商品
         {
@@ -95,6 +106,7 @@ class ApiController extends Controller
             {
                 $g = Goods::find($v['goods_id']);
                 $v['goods_name'] = $g->goods_name;
+                $v['goods_img']=explode(",",$g['goods_img']);
             }
         }else{          //购物车无商品
             $goods = [];
@@ -127,7 +139,7 @@ class ApiController extends Controller
         //获取用户信息
         $userinfo = json_decode(file_get_contents("php://input"), true);
         $redis_login_hash = 'h:xcx:login:' . $token;
-            $openid = Redis::hget($redis_login_hash, 'openid');          //用户OpenID
+            $openid = Redis::hget($redis_login_hash, 'openid');         //用户OpenID
 
         $u0 = XcxLogin::where(['openid' => $openid])->first();
 //        dd($u0->update_time);
@@ -236,8 +248,27 @@ class ApiController extends Controller
                 ]
             ];
         }
-
         return $response;
 
+    }
+
+    //购物车删除
+    public function cartdel(Request $request){
+        $goods_id = $request->post('goods');
+        $goods_arr = explode(',',$goods_id);
+
+        $res = Cart::whereIn('goods_id',$goods_arr)->delete();
+        if($res){    //删除成功走if
+           $response = [
+               'errno'=>0,
+               'msg'=>'ok'
+           ];
+        }else{      //删除失败走else
+            $response = [
+                'errno'=>50002,
+                'msg'=>'删除失败'
+            ];
+        }
+        return $response;
     }
 }
